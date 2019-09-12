@@ -98,7 +98,7 @@ def svm_loss_vectorized(W, X, y, reg):
     # loss.                                                                     #
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-    counts = (margin > 0).astype(int) # N * C
+    counts = (margin > 0).astype(int)  # N * C
     counts[range(N), y] = -np.sum(counts, axis=1)
     dW += np.dot(X.T, counts) / N + reg * W
     pass
