@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from builtins import range
 from builtins import object
+from cs231n.classifiers.softmax import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -79,7 +80,9 @@ class TwoLayerNet(object):
         # shape (N, C).                                                             #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        # maximum(0, array_like) can implement the Relu function
+        scores_hidden = np.maximum(0, np.dot(X, W1) + b1)  # N * H
+        scores = np.dot(scores_hidden, W2) + b2  # N * C
         pass
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -97,9 +100,13 @@ class TwoLayerNet(object):
         # classifier loss.                                                          #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        loss = 0.0
+        exp_scores = np.exp(scores)
+        prob = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+        correct_logprobs = -np.log(prob[range(N), y])
+        loss += np.sum(correct_logprobs) / N
+        loss += 0.5 * reg * (np.sum(W1 * W1) + np.sum(W2 * W2))
         pass
-
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         # Backward pass: compute gradients
@@ -110,9 +117,25 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
         pass
+        # Soft_max part
+        dscores = prob
+        dscores[range(N), y] -= 1
+        dscores /= N
+        dW2 = np.dot(scores_hidden.T, dscores)
+        dW2 += reg * W2
+        db2 = np.sum(dscores, axis=0, keepdims=True)
 
+        # Relu part
+        dhidden_after_relu = np.dot(dscores, W2.T)  # [N * H]
+        dhidden_before_relu = ((np.dot(X, W1) + b1) >= 0) * dhidden_after_relu  # 大于等于0的导数为一，其余为0
+
+        # first_layer
+        dW1 = np.dot(X.T, dhidden_before_relu)
+        dW1 += reg * W1
+        db1 = np.sum(dhidden_before_relu, axis=0, keepdims=True)
+
+        grads['W1'], grads['W2'], grads['b1'], grads['b2'] = dW1, dW2, db1, db2
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return loss, grads
@@ -191,9 +214,9 @@ class TwoLayerNet(object):
                 learning_rate *= learning_rate_decay
 
         return {
-          'loss_history': loss_history,
-          'train_acc_history': train_acc_history,
-          'val_acc_history': val_acc_history,
+            'loss_history': loss_history,
+            'train_acc_history': train_acc_history,
+            'val_acc_history': val_acc_history,
         }
 
     def predict(self, X):

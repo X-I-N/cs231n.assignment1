@@ -133,7 +133,7 @@ class KNearestNeighbor(object):
         pass
         # (x-y)² = (x² + y² - 2xy)
         dists = dists + np.sum(self.X_train ** 2, axis=1).reshape(1, num_train)
-        dists = dists + np.sum(X ** 2, axis=1).reshape(num_test, 1)  # reshape for broadcast
+        dists = dists + np.sum(X ** 2, axis=1, keepdims=True)  # reshape for broadcast
         dists = dists - 2 * np.dot(X, self.X_train.T)
         dists = np.sqrt(dists)
 

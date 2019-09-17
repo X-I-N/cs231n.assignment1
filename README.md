@@ -14,12 +14,13 @@
 
 - [作业要求](http://cs231n.github.io/assignments2019/assignment1/)
 - [Softmax求导推导及代码实现](http://cs231n.github.io/neural-networks-case-study/)
+- [矩阵操作的求导](http://cs231n.github.io/optimization-2/#mat)
 
 
 
 ## 要点记录
 
-1. 向量形式的loss函数，速度最快，需要加以理解和联系
+1. 向量形式的loss函数，速度最快，需要加以理解和练习
 2. SVM 和 softmax的导数：只有对loss函数有贡献的操作进行求导（便于理解）
 
 持续更新...
